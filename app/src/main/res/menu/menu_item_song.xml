@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_addToFavorites"
+        android:title="Add to favourites" />
+    <item
+        android:id="@+id/menu_viewDetail"
+        android:title="View detail" />
+    <item
+        android:id="@+id/menu_editFileName"
+        android:title="Edit file name" />
+    <item
+        android:id="@+id/menu_delete"
+        android:title="Delete"/>
+</menu>
