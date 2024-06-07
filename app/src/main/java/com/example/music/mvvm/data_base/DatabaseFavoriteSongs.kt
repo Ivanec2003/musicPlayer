@@ -30,10 +30,16 @@ class DatabaseFavoriteSongs(context: Context) : SQLiteOpenHelper(context, DATABA
 
     fun insertFavoriteSong(song: SongModel) {
         val db = writableDatabase
+
+        var checkFavoriteSongs = false
+        if (song.statusFavorites == false){
+            checkFavoriteSongs = true
+        }
+
         val values = ContentValues().apply {
             put(FavoriteSongContact.COLUMN_NAME_TITLE, song.title)
             put(FavoriteSongContact.COLUMN_NAME_ARTIST, song.artist)
-            put(FavoriteSongContact.COLUMN_NAME_IS_FAVORITE, if (song.statusFavorites) 1 else 0)
+            put(FavoriteSongContact.COLUMN_NAME_IS_FAVORITE, checkFavoriteSongs)
         }
         db.insert(FavoriteSongContact.TABLE_NAME, null, values)
         db.close()

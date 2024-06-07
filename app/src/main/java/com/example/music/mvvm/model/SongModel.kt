@@ -1,5 +1,7 @@
 package com.example.music.mvvm.model
 
+import android.net.Uri
+
 data class SongModel(
     val id: Long?,
     val title: String?,
@@ -8,4 +10,6 @@ data class SongModel(
     val image: String?,
     val duration: Long?,
     val path: String?,
-    var statusFavorites: Boolean)
+    var statusFavorites: Boolean,
+    val uri: Uri
+)

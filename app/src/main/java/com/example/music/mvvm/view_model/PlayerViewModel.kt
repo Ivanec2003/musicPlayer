@@ -3,8 +3,10 @@ package com.example.music.mvvm.view_model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.music.mvvm.data_base.Repository
 import com.example.music.mvvm.model.SongModel
+import kotlinx.coroutines.launch
 
 class PlayerViewModel(
     private val repository: Repository
@@ -26,13 +28,15 @@ class PlayerViewModel(
 
     fun deleteSong(songModel: SongModel) {
         if (songModel.id != null && songModel.path != null) {
-            repository.deleteAudioFiles(songModel.id, songModel.path)
+            viewModelScope.launch {
+                repository.deleteAudioFiles(songModel.uri)
 
-            val updatedList = _listSongs.value?.toMutableList()
-            updatedList?.remove(songModel)
+                val updatedList = _listSongs.value?.toMutableList()
+                updatedList?.remove(songModel)
 
-            _listSongs.value = updatedList
-            Data.listSongs = updatedList ?: listOf()
+                _listSongs.value = updatedList
+                Data.listSongs = updatedList ?: listOf()
+            }
         }
     }
 

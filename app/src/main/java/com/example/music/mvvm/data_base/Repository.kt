@@ -15,7 +15,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.music.mvvm.model.SongModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
+
 
 class Repository(private val context: Context, private val fragment: Fragment) {
 
@@ -59,6 +62,10 @@ class Repository(private val context: Context, private val fragment: Fragment) {
                 val albumImage = getUriAlbum(albumId)
                 val duration = cursor.getLong(durationIndex)
                 val path = cursor.getString(pathIndex)
+                val contentUri = ContentUris.withAppendedId(
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    id
+                )
 
                 val song = SongModel(
                     id,
@@ -68,7 +75,8 @@ class Repository(private val context: Context, private val fragment: Fragment) {
                     albumImage.toString(),
                     duration,
                     path,
-                    false
+                    false,
+                    contentUri
                 )
 
                 listAudioFiles.add(song)
@@ -118,36 +126,90 @@ class Repository(private val context: Context, private val fragment: Fragment) {
             null
         )
     }
-    fun isSongDeletedFromMediaStore(songId: Long): Boolean {
+    fun checkUriData(context: Context, uri: Uri) {
         val contentResolver = context.contentResolver
-        val songUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, songId)
-        val cursor = contentResolver.query(songUri, null, null, null, null)
-        cursor?.use {
-            return it.count == 0
+
+        // Виконання запиту до ContentResolver за вказаним URI
+        val cursor = contentResolver.query(
+            uri,
+            null, // Вибірка всіх стовпців
+            null,
+            null,
+            null
+        )
+
+        // Перевірка, чи є результат запиту та чи містить він дані
+        if (cursor != null && cursor.moveToFirst()) {
+            // Отримання даних з кожного стовпця
+            val columnCount = cursor.columnCount
+            for (i in 0 until columnCount) {
+                val columnName = cursor.getColumnName(i)
+                val columnValue = cursor.getString(i)
+                println("$columnName: $columnValue")
+            }
+        } else {
+            println("No data found for the provided URI.")
         }
-        return false
+
+        // Закриття курсора після використання
+        cursor?.close()
     }
-    fun deleteAudioFiles(songId: Long, path: String) {
 
-
+    fun deleteAudioFiles(uri: Uri) {
         val contentResolver = context.contentResolver
-        val songUri =
-            ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,songId)
-
         try {
-            contentResolver.delete(songUri, "null", null)
-            deleteAudioFileFromStorage(path)
+            contentResolver.delete(uri, null, null)
+            // Файл успішно видалено
         } catch (e: Exception) {
             e.printStackTrace()
+            // Виникла помилка під час видалення файлу
         }
     }
+    /*suspend fun deleteAudioFiles(songId: Long) {
+        return withContext(Dispatchers.IO) {
+            try {
+                val contentUri = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+                val selection = "${MediaStore.Audio.Media._ID} = ?"
+                val selectionArgs = arrayOf(songId.toString())
+                val rowsDeleted = context.contentResolver.delete(contentUri, selection, selectionArgs)
+                if (rowsDeleted > 0) {
+                    println("Аудіофайл успішно видалено з MediaStore")
+                } else {
+                    println("Не вдалося видалити аудіофайл з MediaStore")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }*/
+
+    /*fun deleteAudioFiles(songId: Long, path: String) {
+
+
+       // Отримання URI для аудіофайлу
+        val contentUri = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+        val selection = "_id = ?"
+        val selectionArgs = arrayOf(songId.toString())
+
+       try {
+           // Виклик delete через ContentResolver
+           val rowsDeleted = context.contentResolver.delete(contentUri, selection, selectionArgs)
+           if (rowsDeleted > 0) {
+               println("Файл успішно видалено з MediaStore")
+           } else {
+               println("Не вдалося видалити файл з MediaStore")
+           }
+       } catch (e: Exception) {
+           e.printStackTrace()
+       }
+
+    }*/
     private fun deleteAudioFileFromStorage(path: String): Boolean {
         val file = File(path)
-        return if (file.exists()) {
-            file.delete()
-        } else {
-            false
-        }
+        if (file.exists()){
+            return file.delete()
+        }else
+            return false
     }
 
     fun updateFavoriteStatus(song: SongModel) {

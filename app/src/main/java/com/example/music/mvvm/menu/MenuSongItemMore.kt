@@ -2,15 +2,18 @@ package com.example.music.mvvm.menu
 
 import android.app.AlertDialog
 import android.content.Context
+import android.net.Uri
 import android.view.MenuItem
 import com.example.music.R
 import com.example.music.mvvm.model.SongModel
 import com.example.music.mvvm.view_model.PlayerViewModel
+import com.example.music.utils.FileHelper
+import java.io.File
 
 object MenuSongItemMore {
     private lateinit var viewModelMenu: PlayerViewModel
 
-    fun clickMenuItem(context: Context, menuItem: MenuItem, song: SongModel, viewModel: PlayerViewModel): Boolean {
+    fun clickMenuItem(context: Context, menuItem: MenuItem, song: SongModel, viewModel: PlayerViewModel/*, fileHelper: FileHelper*/): Boolean {
 
         viewModelMenu = viewModel
 
@@ -25,7 +28,6 @@ object MenuSongItemMore {
             }
             R.id.menu_editFileName ->{
                 val newName = "NewName"
-                viewModel.changeNameSong(song, newName)
                 return true
             }
             R.id.menu_delete -> {
@@ -63,6 +65,7 @@ object MenuSongItemMore {
         }
         return ""
     }
+
     private fun updateStatusFavoriteSong(){
 
     }
