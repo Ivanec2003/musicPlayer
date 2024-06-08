@@ -20,18 +20,13 @@ class ListSongsAdapter(
         parent: ViewGroup,
         viewType: Int
     ): SongViewHolder {
-
-        val binding =
-            SongItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = SongItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return SongViewHolder(binding)
-
     }
 
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
-
         val contact = getItem(position)
         holder.bind(contact, onItemClick, onMoreButtonClick)
-
     }
 
     class SongViewHolder(private val binding: SongItemBinding) :
@@ -62,6 +57,7 @@ class ListSongsAdapter(
                 imageButtonMenuMore.setOnClickListener {
                     onMoreButtonClick(song, it)
                 }
+
             }
 
         }
@@ -71,11 +67,10 @@ class ListSongsAdapter(
     class ListSongsDiffUtilCallBack : DiffUtil.ItemCallback<SongModel>() {
 
         override fun areContentsTheSame(oldItem: SongModel, newItem: SongModel): Boolean {
-            return oldItem.id == newItem.id
-        }
-
-        override fun areItemsTheSame(oldItem: SongModel, newItem: SongModel): Boolean {
             return oldItem == newItem
+        }
+        override fun areItemsTheSame(oldItem: SongModel, newItem: SongModel): Boolean {
+            return oldItem.id == newItem.id
         }
 
     }

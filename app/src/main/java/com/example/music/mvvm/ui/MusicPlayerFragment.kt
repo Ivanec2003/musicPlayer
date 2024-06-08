@@ -1,4 +1,4 @@
-package com.example.music.mvvm.music_player
+package com.example.music.mvvm.ui
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

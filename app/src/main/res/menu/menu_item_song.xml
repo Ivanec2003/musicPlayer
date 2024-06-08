@@ -6,9 +6,6 @@
         android:id="@+id/menu_viewDetail"
         android:title="View detail" />
     <item
-        android:id="@+id/menu_editFileName"
-        android:title="Edit file name" />
-    <item
-        android:id="@+id/menu_delete"
-        android:title="Delete"/>
+        android:id="@+id/menu_editCancel"
+        android:title="Cancel" />
 </menu>

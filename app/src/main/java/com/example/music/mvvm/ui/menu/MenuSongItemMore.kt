@@ -1,41 +1,33 @@
-package com.example.music.mvvm.menu
+package com.example.music.mvvm.ui.menu
 
 import android.app.AlertDialog
 import android.content.Context
-import android.net.Uri
 import android.view.MenuItem
 import com.example.music.R
 import com.example.music.mvvm.model.SongModel
-import com.example.music.mvvm.view_model.PlayerViewModel
-import com.example.music.utils.FileHelper
-import java.io.File
+import com.example.music.mvvm.view_model.CommonViewModelFactory
 
 object MenuSongItemMore {
-    private lateinit var viewModelMenu: PlayerViewModel
+    private lateinit var viewModelMenu: CommonViewModelFactory
 
-    fun clickMenuItem(context: Context, menuItem: MenuItem, song: SongModel, viewModel: PlayerViewModel/*, fileHelper: FileHelper*/): Boolean {
+    fun clickMenuItem(context: Context, menuItem: MenuItem, currentSong: SongModel, viewModel: CommonViewModelFactory): Boolean {
 
         viewModelMenu = viewModel
 
         when (menuItem.itemId) {
             R.id.menu_addToFavorites -> {
-                viewModel.updateFavoriteStatusSong(song)
+                viewModel.updateFavoriteStatusSong(currentSong)
                 return true
             }
             R.id.menu_viewDetail -> {
-                showSongDetailsDialog(context, song)
+                showSongDetailsDialog(context, currentSong)
                 return true
             }
-            R.id.menu_editFileName ->{
-                val newName = "NewName"
-                return true
+            R.id.menu_editCancel ->{
+                return false
             }
-            R.id.menu_delete -> {
-                viewModel.deleteSong(song)
-                return true
-            }
-            else -> return false
         }
+        return false
     }
 
     private fun showSongDetailsDialog(context: Context, song: SongModel) {
@@ -44,7 +36,7 @@ object MenuSongItemMore {
 
         val message ="\nSong name: " + song.artist + "\n" +
                 "\nArtist: " + song.artist + "\n" +
-                "\nDuration: " + formatDuration(song.duration)+ "\n" +
+                "\nDuration: " + formatDuration(song.duration) + "\n" +
                 "\nAlbum Name: " + song.album + "\n" +
                 "\nPath: " + song.path + "\n"
         dialogBuilder.setMessage(message)
@@ -64,9 +56,5 @@ object MenuSongItemMore {
             return String.format("%02d:%02d", minutes, remainingSeconds)
         }
         return ""
-    }
-
-    private fun updateStatusFavoriteSong(){
-
     }
 }

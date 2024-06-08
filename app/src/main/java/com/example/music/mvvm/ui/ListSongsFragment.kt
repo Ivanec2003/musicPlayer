@@ -1,4 +1,4 @@
-package com.example.music.mvvm.songs
+package com.example.music.mvvm.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,24 +13,21 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.music.R
-import com.example.music.databinding.FragmentSongsBinding
+import com.example.music.databinding.FragmentListSongsBinding
 import com.example.music.mvvm.adapter.ListSongsAdapter
-import com.example.music.mvvm.data_base.Repository
-import com.example.music.mvvm.menu.MenuSongItemMore
+import com.example.music.mvvm.data.Repository
+import com.example.music.mvvm.factories.ViewModelFactory
+import com.example.music.mvvm.ui.menu.MenuSongItemMore
 import com.example.music.mvvm.model.SongModel
-import com.example.music.mvvm.music_player.MusicPlayerFragment
-import com.example.music.mvvm.view_model.PlayerViewModel
-import com.example.mymusic.mvvm.songs.SongsFactory
+import com.example.music.mvvm.view_model.CommonViewModelFactory
 import com.example.yourapp.utils.PermissionHandler
 
-class SongsFragment : Fragment() {
-    private var _binding: FragmentSongsBinding? = null
+class ListSongsFragment : Fragment() {
+    private var _binding: FragmentListSongsBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: PlayerViewModel
+    private lateinit var viewModel: CommonViewModelFactory
     private lateinit var adapter: ListSongsAdapter
-
-    /*private lateinit var fileHelper: FileHelper*/
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
 
@@ -39,42 +36,32 @@ class SongsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        viewModel = initViewModel()
-        viewModel.fetchListSong()
+        initPermissionLauncher()
+        getPermission()
 
-        _binding = FragmentSongsBinding.inflate(inflater, container, false)
+        _binding = FragmentListSongsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                PermissionHandler.handlePermissionResult(
-                    isGranted,
-                    requireContext(),
-                    requestPermissionLauncher
-                )
-            }
-
-        initPermissionLauncher()
-        getPermission()
+        initViewModel()
+        viewModel.fetchListSong()
 
         initAdapter()
         viewModel.listSongs.observe(viewLifecycleOwner) { listSongs ->
             adapter.submitList(listSongs)
         }
 
-        /*fileHelper = FileHelper(this)*/
 
     }
 
-    private fun initViewModel(): PlayerViewModel {
-        return ViewModelProvider(
+    private fun initViewModel() {
+        viewModel = ViewModelProvider(
             this,
-            SongsFactory(Repository(requireContext(), this))
-        )[PlayerViewModel::class.java]
+            ViewModelFactory(Repository(requireContext()))
+        )[CommonViewModelFactory::class.java]
     }
 
     private fun initAdapter() {
@@ -94,8 +81,10 @@ class SongsFragment : Fragment() {
     }
 
     private fun clickOnItemListSong(song: SongModel) {
-        parentFragmentManager.beginTransaction().addToBackStack("")
-            .replace(R.id.fragment_container, MusicPlayerFragment()).commit()
+        parentFragmentManager.beginTransaction()
+            .addToBackStack("")
+            .replace(R.id.fragment_container, MusicPlayerFragment())
+            .commit()
     }
 
     private fun clickOnMenuMore(song: SongModel, view: View) {
@@ -107,7 +96,7 @@ class SongsFragment : Fragment() {
                 requireContext(),
                 menuItem,
                 song,
-                viewModel/*, fileHelper*/
+                viewModel
             )
         }
 

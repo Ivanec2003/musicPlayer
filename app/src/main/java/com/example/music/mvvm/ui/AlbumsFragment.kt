@@ -1,4 +1,4 @@
-package com.example.music.mvvm.albums
+package com.example.music.mvvm.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
